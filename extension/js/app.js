@@ -16,6 +16,7 @@ window.onload = function() {
            let lat = parseFloat(coords_arr[0].trim())
            let lng = parseFloat(coords_arr[1].trim())
            let coords = { lat,lng, address }
+           console.log(coords)
            add(coords)
           }
         }, 600);
