@@ -8,8 +8,8 @@
 
         <div class="col-md-12 mt-2">
            <select class="form-control" v-model="url" id="">
-                <option value="https://comprasmias.000webhostapp.com">webhost</option>
-                <option value="http://localhost/cmapi">Localhost</option>
+                <option value="https://comprasmias.000webhostapp.com">webhost server</option>
+                <option value="http://localhost/cmapi">Localhost </option>
            </select>
         </div>
         <div class="col-md-12 mt-2">
