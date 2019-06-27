@@ -1,49 +1,55 @@
 <template>
     <div>
-        <div class="row">
-            <div class="col-12 d-flex justify-content-center mb-3">
-                <button class="render btn btn-warning">GET</button>
+        <div v-if="coords.length > 0" class="col-12 mb-2">
+            <div class="custom-control custom-switch">
+                    <input @click="array = !array" type="checkbox" class="custom-control-input" id="customSwitch1">
+                    <label class="custom-control-label" for="customSwitch1"></label>
             </div>
         </div>
-
-        <div class="col-md-12 mt-2">
-           <select class="form-control" v-model="url" id="">
-                <option value="https://comprasmias.000webhostapp.com">webhost server</option>
-                <option value="http://localhost/cmapi">Localhost </option>
-           </select>
+        <div v-if="array" class="col-12 mt-2 pt-2  d-flex flex-column">
+            <i class="far fa-copy align-self-end c-pointer" @mousedown="clipboard(JSON.stringify($data.coords),$event)" @mouseup="up($event)"></i>
+            <pre v-html="prettyResponse"></pre>
         </div>
-        <div class="col-md-12 mt-2">
-           <input type="text" placeholder="order_id" v-model="order_id" class="form-control">
-        </div>
-
-        <div class="col-md-12 mt-2">
-            <div v-if="sent" class="alert alert-success" role="alert">
-              Coords sent
-            </div>
-        </div>
-
-        <ul class="list-group">
-            <li class="list-group-item" v-for="(coord, index) in coords" :key="index">
-                <div class="row pt-5">
-                    <div class="col-6">(lat: {{ coord.lat }}</div>
-                    <div class="col-6">lng: {{ coord.lng }})</div>
-                    <div class="col-12 mt-2">lng {{ coord.address }}</div>
-                    <div v-if="true" class="col-12 mt-5 d-flex justify-content-end p-3">
-                        <div v-if="true" class="spinner-grow spinner-border-sm text-primary mr-3" role="status">
-                         <span class="sr-only">Loading...</span>
+        <div v-if="!array" class="col-12 mt-2 mb-2">
+            <div class="card text-white bg-primary mb-3" v-for="(coord, index) in coords" :key="index">
+                <div class="card-header">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <b>{{ coord.address }}</b>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <b>latitude:</b> <span>{{ coord.lat }}</span>
                         </div>
-                        <span @click="endpoint(coord.lat,coord.lng)" class="btn btn-outline-primary">
-                            <i class="far fa-paper-plane"></i>
-                        </span>
+                        <div>
+                            <i class="far fa-copy c-pointer" @mousedown="clipboard(coord.lat,$event)" @mouseup="up($event)"></i>
+                        </div>
                     </div>
-                    <div v-if="true" class="col-12">
-                        <div class="response p-3" v-html="prettyResponse"></div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <div>
+                            <b>longitude:</b> <span>{{ coord.lng }}</span>
+                        </div>
+                        <div>
+                            <i class="far fa-copy c-pointer" @mousedown="clipboard(coord.lng,$event)" @mouseup="up($event)"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3" v-if="false">
+                        <h6>Response:</h6>
+                        <pre></pre>
                     </div>
                 </div>
-
-
-            </li>
-        </ul>
+                <div class="card-footer d-flex justify-content-end">
+                    <span>
+                        <div :id="'sp-'+index" class="spinner-border spinner-border-sm text-info mr-2 d-none" role="status"></div>
+                        <i :id="'ch-'+index" class="far fa-check-circle mr-2 text-ok d-none"></i>
+                        <i @click="send(index,coord.lat,coord.lng)" class="far fa-paper-plane c-pointer"></i>
+                    </span>
+                </div>
+            </div>
+            <div v-if="coords.length == 0" class="col-12 mt-2 text-center">
+                <h5><b>No coordinates selected</b></h5>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -54,31 +60,42 @@ import axios from 'axios'
 export default {
     data(){
         return {
-            // coords: [{"address":"Próspero García 100-98","lat":-26.821777,"lng":-65.192862},{"address":"Próspero García 100-98","lat":-26.821609,"lng":-65.193994},{"address":"Próspero García 25","lat":-26.821609,"lng":-65.193994},{"address":"Sta. Fe","lat":-26.821343,"lng":-65.195553},{"address":"DISTRIBUIDORA MULLER - SUCURSAL TUCUMAN","lat":-26.821017,"lng":-65.197197},{"address":"Sta. Fe 298-216","lat":-26.82082,"lng":-65.198256},{"address":"Sta. Fe 298-216","lat":-26.820696,"lng":-65.198891},{"lat":-26.820615,"lng":-65.199268,"address":"Sta. Fe 398-300"}],
-            sent:false,
+            loading:false,
+            ok:false,
             order_id: null,
             url:'',
             coords:[],
-            res:{ status:200,message:"Response send",data:{ name:"test" } }
+            res:{ status:200,message:"Response send",data:{ name:"test" } },
+            array:false
         }
     },
     computed:{
-        prettyResponse:function(){ return this.pretty(this.res) }
+        prettyResponse:function(){ return this.pretty(this.coords) }
     },
     mounted(){
-       var btn = this.$el.getElementsByClassName("render")[0]
        self = this
-       btn.addEventListener('click',function() {
-           
-            chrome.storage.local.get("coords", function(items){
-                    console.log(items.coords)
-                    self.render(items.coords)
-            });
-
-
-       })
+       chrome.storage.local.get("coords", function(items){
+            self.render(items.coords)
+       });
     },
     methods:{
+        clipboard:function(str,event) {
+            var el = document.createElement('textarea');
+            el.value = str;
+            el.setAttribute('readonly', '');
+            el.style = {position: 'absolute', left: '-9999px'};
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            event.target.classList.remove("far")
+            event.target.className += " fas";
+        },
+        up:function(event){
+            console.log("up")
+            event.target.classList.remove("fas")
+            event.target.className += " far";
+        },
         pretty:function syntaxHighlight(json) {
             if (typeof json != 'string') {
                 json = JSON.stringify(json, undefined, 2);
@@ -103,15 +120,26 @@ export default {
         render:function(coords){
             this.coords = coords
         },
-        endpoint:function(lat,lng){
-            let url = this.url + '/cadetes/seguimiento?order_id='+this.order_id+'&lat='+lat+'&lng='+lng
-            self = this
-            axios.get(url)
-            .then(function(res){
-                self.sent = true
-                setTimeout(function(){ self.sent = false },3000)
-                console.log(res)
+        send(index,lat,lng){
+            var method
+
+            document.getElementById('sp-'+index).classList.remove("d-none")
+
+            switch(localStorage.getItem('method'))
+            {
+                case 'put' : method = 'put'; break;
+                default: method = 'post'; break;
+            }
+
+            let endpoint = localStorage.getItem('endpoint');
+            let headers  = { headers:{ Authorization:localStorage.getItem('token')}}
+
+            axios[method](endpoint,{lat,lng},headers)
+            .then(res => {
+                document.getElementById('sp-'+index).classList.add("d-none");
+                document.getElementById('ch-'+index).classList.remove("d-none")
             })
+
         }
     }
 
@@ -125,4 +153,11 @@ export default {
         color:#4caf50;
         overflow-y: scroll
     }
+    pre { padding: 0px; margin: 0px; }
+    .string { color: green; }
+    .number { color: darkorange; }
+    .boolean { color: blue; }
+    .null { color: magenta; }
+    .key { color: red; }
+
 </style>

@@ -8,9 +8,6 @@
                 <a class="nav-link active" @click="current = 'list'">List</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" @click="current = 'array'">Array</a>
-              </li>
-              <li class="nav-item">
                 <a class="nav-link" @click="current = 'config'">Config endpoint</a>
               </li>
             </ul>
@@ -27,10 +24,9 @@
 
 <script>
 import list from './components/list'
-import array from './components/array'
 import config from './components/config'
 export default {
-  components:{list,array,config},
+  components:{list,config},
   name: 'app',
   data () {
     return {
@@ -53,4 +49,13 @@ export default {
   width: 100vw;
   height: 100vh;
 }
+
+.text-ok{
+  color:#0bf941!important;
+}
+
+.c-pointer{
+  cursor: pointer;
+}
+
 </style>

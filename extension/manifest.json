@@ -1,9 +1,8 @@
 {
     "manifest_version": 2,
-   
     "name": "Coordify",
     "description": "Get Google Maps coords easily",
-    "version": "2.3",
+    "version": "0.1",
     "icons": {
       "32": "images/icon_32.png",
       "128": "images/icon_128.png"
@@ -22,7 +21,7 @@
       {
         "matches": [ "https://www.google.com.ar/maps/*", "http://www.google.com.ar/maps/*"],
         "all_frames": true,
-        "js": [ "js/app.js" ,"js/background.js","js/build.js" ],
+        "js": [ "js/app.js","js/build.js" ],
         "css": ["css/styles.css"]
       }
     ],

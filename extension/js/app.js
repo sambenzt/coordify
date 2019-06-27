@@ -31,7 +31,6 @@ window.onload = function() {
             if(items.coords != undefined) {
                 arr = items.coords
                 arr.push(coords)
-
                 sessionStorage.clear();
                 sessionStorage.setItem('coords', JSON.stringify(arr));
                 storage.remove("coords", function (){
@@ -48,8 +47,6 @@ window.onload = function() {
                 });
             }
         });
- 
     }
-
   };
 
