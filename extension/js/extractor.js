@@ -1,8 +1,6 @@
 window.onload = function() {
    
-    chrome.storage.local.set({ "coords": [] }, function(){
-            
-    });
+    chrome.storage.local.set({ "coords": [] }, function(){});
     
     setTimeout(() => {
       let canvas = document.getElementsByClassName("widget-scene-canvas");
@@ -26,8 +24,10 @@ window.onload = function() {
     function add(coords){
 
         var storage = chrome.storage.local;
-        var arr = [];
-        storage.get("coords", function (items){        
+        var arr     = [];
+
+        storage.get("coords", function (items){   
+
             if(items.coords != undefined) {
                 arr = items.coords
                 arr.push(coords)
@@ -46,6 +46,7 @@ window.onload = function() {
                     console.log(arr)
                 });
             }
+            
         });
     }
   };

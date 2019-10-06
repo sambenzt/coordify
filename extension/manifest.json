@@ -21,7 +21,7 @@
       {
         "matches": [ "https://www.google.com.ar/maps/*", "http://www.google.com.ar/maps/*"],
         "all_frames": true,
-        "js": [ "js/app.js","js/build.js" ],
+        "js": ["js/extractor.js","js/bundle.js"],
         "css": ["css/styles.css"]
       }
     ],
