@@ -14,10 +14,7 @@ var listItems  = ''
 
 chrome.storage.local.get("coords", function(items){
 
-    var coords = items.coords
-    console.log(coords)
-
-    if(coords.length == 0)
+    if(items.coords == undefined || items.coords.length == 0)
     {
         listItems += `
             <li class="list-group-item mt-2 text-center">
@@ -27,6 +24,8 @@ chrome.storage.local.get("coords", function(items){
     }
     else
     {
+        var coords = items.coords
+
         for(let coord of coords)
         {
             listItems += `
